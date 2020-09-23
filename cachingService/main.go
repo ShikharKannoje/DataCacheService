@@ -13,7 +13,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const SIZE = 10
+const SIZE = 100
 
 const (
 	hostname     = "localhost"
