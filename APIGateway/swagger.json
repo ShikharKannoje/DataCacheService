@@ -57,6 +57,19 @@
           "application/json"
         ]
       }
+    },
+    "/relodeDataFromDB": {
+      "get": {
+        "description": "Reload the top 100 records to the cache.",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "employee details loaded to the cache"
+          }
+        }
+      }
     }
   }
 }

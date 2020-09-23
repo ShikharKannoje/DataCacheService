@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"sync"
 
 	"github.com/gorilla/mux"
@@ -118,7 +119,7 @@ func startupServer() {
 	r.HandleFunc("/", home)
 	r.HandleFunc("/employeeDetails/{id}", employeeDetails).Methods("GET")
 	r.HandleFunc("/alterEmployee", alterEmployee).Methods("PUT")
-	// http.HandleFunc("/getSortedByWBS", getSortedWBS)
+	r.HandleFunc("/RelodeDataFromDB", RelodeDataFromDB)
 	// http.HandleFunc("/getSortedByDatesAndWBS", getSortedByDatesAndWBS)
 
 	log.Fatal(http.ListenAndServe("localhost:8000", r))
@@ -208,4 +209,45 @@ func employeeDetails(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	startupServer()
+
+}
+
+func RelodeDataFromDB(w http.ResponseWriter, r *http.Request) {
+	//loading top 100 fields from the db
+	db, err := sql.Open("postgres", conStr)
+	if err != nil {
+		log.Println(err)
+		WriteJSONResponse(w, 500, "database connection failed")
+		return
+	}
+	log.Println("Database connected")
+
+	statement := `SELECT * FROM employee ORDER BY employeeid LIMIT 100`
+
+	rows, err := db.Query(statement)
+	if err != nil {
+		WriteJSONResponse(w, 500, "query failed")
+		log.Println(err)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var employeeid int
+		var employeename string
+		err = rows.Scan(&employeename, &employeeid)
+		if err != nil {
+			fmt.Println(err)
+			panic(err)
+		}
+		node := &Node{employeeid: strconv.Itoa(employeeid), employeename: employeename}
+		cash.Add(node)
+		cash.Hash[strconv.Itoa(employeeid)] = node
+	}
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		panic(err)
+	}
+	WriteJSONResponse(w, 200, "Data Loaded to the cache")
+	return
 }

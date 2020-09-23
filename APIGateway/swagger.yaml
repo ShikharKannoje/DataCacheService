@@ -1,0 +1,53 @@
+consumes:
+  - application/json
+produces:
+  - application/json
+schemes:
+  - http
+  - https
+swagger: '2.0'
+info:
+  description:
+    Data Cache Service for a Employee table
+  title: Data Cache Serice
+  version: 0.1.0
+host: 'localhost:8080'
+basePath: /
+paths:
+  /:
+    get:
+      produces:
+        - application/json
+      operationId: home
+      responses:
+        '200':
+          description: Successfull
+  /getEmployees:
+    get:
+      description:
+        Check for the employee name of the given employee id, first in cache, if not then query from DB
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: employee details
+  /alterEmployee:
+    put:
+      summary: Update the DB as well as Cache
+      description: Update the Employee name for the given employeeID
+      responses:
+        200:
+          description: OK
+      produces:
+        - application/json
+  /relodeDataFromDB:
+    get:
+      description:
+        Reload the top 100 records to the cache.
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: employee details loaded to the cache
+  
+  

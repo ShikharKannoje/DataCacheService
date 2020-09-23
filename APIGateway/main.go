@@ -30,6 +30,7 @@ func startupServer() {
 	r.HandleFunc("/", home)
 	r.HandleFunc("/getEmployees/{id}", getEmployees).Methods("GET")
 	r.HandleFunc("/alterEmployee", alterEmployee).Methods("PUT")
+	r.HandleFunc("/relodeDataFromDB", reloadDataFromDB).Methods("GET")
 
 	log.Fatal(http.ListenAndServe("localhost:8080", r))
 }
@@ -38,6 +39,28 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusInternalServerError)
 	fmt.Fprintf(w, "Hello, The server is running")
+}
+func reloadDataFromDB(w http.ResponseWriter, r *http.Request) {
+	log.Println("reached here")
+	check, err := http.Get(cachehost + "RelodeDataFromDB")
+	if err != nil {
+		log.Println(err)
+	}
+	defer check.Body.Close()
+
+	checkbody, err := ioutil.ReadAll(check.Body)
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Println(string(checkbody))
+	if checkbody == nil {
+		WriteJSONResponse(w, 404, "Not Found in DB")
+		return
+	}
+	WriteJSONResponse(w, 200, strings.Trim(string(checkbody), "\n"))
+	log.Println("Transaction over")
+	return
 }
 
 type employeeStruct struct {
