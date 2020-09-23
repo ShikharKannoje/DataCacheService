@@ -138,6 +138,7 @@ func alterEmployee(w http.ResponseWriter, r *http.Request) {
 		WriteJSONResponse(w, 404, "Invalid Request")
 		return
 	}
+	cash.Lock()
 	db, err := sql.Open("postgres", conStr)
 	if err != nil {
 		log.Println(err)
@@ -156,6 +157,7 @@ func alterEmployee(w http.ResponseWriter, r *http.Request) {
 	log.Println("Employee Name is  : ", emp.Employeename, emp.Employeeid)
 	node := &Node{employeeid: emp.Employeeid, employeename: emp.Employeename}
 	cash.Update(node)
+	cash.Unlock()
 	WriteJSONResponse(w, 200, emp.Employeename)
 	return
 
