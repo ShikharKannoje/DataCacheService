@@ -22,7 +22,7 @@ paths:
       responses:
         '200':
           description: Successfull
-  /getEmployees:
+  /getEmployees/employeeid:
     get:
       description:
         Check for the employee name of the given employee id, first in cache, if not then query from DB
@@ -49,5 +49,14 @@ paths:
       responses:
         '200':
           description: employee details loaded to the cache
+  /pageData/from/to:
+    get:
+      description:
+        Load a range of employee details to cache from DB
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: employee details of a range loaded to the cache
   
   
