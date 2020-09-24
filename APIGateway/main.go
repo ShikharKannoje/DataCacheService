@@ -7,15 +7,15 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
 
-const (
-	cachehost = `http://localhost:8000/`
-)
+var cachehost = `http://` + os.Getenv("API_GATE_DOMAIN") + "/" // localhost:8000
+var apiGateserve = os.Getenv("API_GATE_SERVER")
 
 // WriteJSONResponse represents a utility function which writes status code and JSON to response
 func WriteJSONResponse(w http.ResponseWriter, statusCode int, data interface{}) {
@@ -32,7 +32,7 @@ func startupServer() {
 	r.HandleFunc("/alterEmployee", alterEmployee).Methods("PUT")
 	r.HandleFunc("/relodeDataFromDB", reloadDataFromDB).Methods("GET")
 
-	log.Fatal(http.ListenAndServe("localhost:8080", r))
+	log.Fatal(http.ListenAndServe(apiGateserve, r))
 }
 
 func home(w http.ResponseWriter, r *http.Request) {

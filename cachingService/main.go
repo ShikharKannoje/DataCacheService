@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
 
@@ -16,15 +17,30 @@ import (
 
 const SIZE = 100
 
-const (
-	hostname     = "localhost"
-	hostport     = 5432
-	username     = "postgres"
-	password     = "root"
-	databasename = "employee"
-)
+var hostport, _ = strconv.Atoi(os.Getenv("DS_HOSTPORT"))
+var hostname = os.Getenv("DS_HOSTNAME")
+var username = os.Getenv("DS_USERNAME")
+var password = os.Getenv("DS_PASSWORD")
+var databasename = os.Getenv("DS_DATABASE")
+var serverRun = os.Getenv("DS_SERVERRUN") //localhost:8000
 
-var conStr = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", hostname, hostport, username, password, databasename)
+// const (
+// //hostname     = os.Getenv("HOSTNAME")
+// //hostport     = 5432
+// // username     = "postgres"
+// // password     = "root"
+// // databasename = "employee"
+// )
+
+// const (
+// 	hostname     = "localhost"
+// 	hostport     = 5432
+// 	username     = "postgres"
+// 	password     = "root"
+// 	databasename = "employee"
+// )
+
+var conStr = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DS_HOSTNAME"), hostport, os.Getenv("DS_USERNAME"), os.Getenv("DS_PASSWORD"), os.Getenv("DS_DATABASE"))
 
 type Node struct {
 	employeeid   string
@@ -122,7 +138,7 @@ func startupServer() {
 	r.HandleFunc("/RelodeDataFromDB", RelodeDataFromDB)
 	// http.HandleFunc("/getSortedByDatesAndWBS", getSortedByDatesAndWBS)
 
-	log.Fatal(http.ListenAndServe("localhost:8000", r))
+	log.Fatal(http.ListenAndServe(serverRun, r))
 
 }
 
@@ -208,6 +224,7 @@ func employeeDetails(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+	fmt.Println(conStr)
 	startupServer()
 
 }
