@@ -25,14 +25,6 @@ var databasename = os.Getenv("DS_DATABASE")
 var serverRun = os.Getenv("DS_SERVERRUN") //localhost:8000
 
 // const (
-// //hostname     = os.Getenv("HOSTNAME")
-// //hostport     = 5432
-// // username     = "postgres"
-// // password     = "root"
-// // databasename = "employee"
-// )
-
-// const (
 // 	hostname     = "localhost"
 // 	hostport     = 5432
 // 	username     = "postgres"

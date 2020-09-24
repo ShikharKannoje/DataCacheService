@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -47,6 +48,21 @@ func pageData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	to := vars["to"]
 	from := vars["from"]
+	TO, err := strconv.Atoi(to)
+	if err != nil {
+		WriteJSONResponse(w, 403, "Invalid Request")
+		return
+	}
+	FROM, err := strconv.Atoi(from)
+	if err != nil {
+		WriteJSONResponse(w, 403, "Invalid Request")
+		return
+	}
+
+	if FROM > TO {
+		WriteJSONResponse(w, 403, "Invalid Request")
+		return
+	}
 	check, err := http.Get(cachehost + "pageData/" + from + "/" + to)
 	if err != nil {
 		log.Println(err)
@@ -143,7 +159,11 @@ func getEmployees(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	id := vars["id"]
-
+	_, err := strconv.Atoi(id)
+	if err != nil {
+		WriteJSONResponse(w, 403, "Invalid Request")
+		return
+	}
 	check, err := http.Get(cachehost + "employeeDetails/" + id)
 	if err != nil {
 		log.Println(err)
