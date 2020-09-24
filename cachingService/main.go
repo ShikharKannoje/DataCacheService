@@ -136,7 +136,7 @@ func startupServer() {
 	r.HandleFunc("/employeeDetails/{id}", employeeDetails).Methods("GET")
 	r.HandleFunc("/alterEmployee", alterEmployee).Methods("PUT")
 	r.HandleFunc("/RelodeDataFromDB", RelodeDataFromDB)
-	// http.HandleFunc("/getSortedByDatesAndWBS", getSortedByDatesAndWBS)
+	r.HandleFunc("/pageData/{from}/{to}", pageData)
 
 	log.Fatal(http.ListenAndServe(serverRun, r))
 
@@ -145,6 +145,48 @@ func startupServer() {
 type employeeStruct struct {
 	Employeeid   string `json:"employeeid"`
 	Employeename string `json:"employeename"`
+}
+
+func pageData(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	to := vars["to"]
+	from := vars["from"]
+	db, err := sql.Open("postgres", conStr)
+	if err != nil {
+		log.Println(err)
+		WriteJSONResponse(w, 500, "database connection failed")
+		return
+	}
+	log.Println("Database connected")
+
+	statement := `SELECT * FROM employee WHERE employeeid >= $1 AND employeeid <= $2`
+
+	rows, err := db.Query(statement, from, to)
+	if err != nil {
+		WriteJSONResponse(w, 500, "query failed")
+		log.Println(err)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var employeeid int
+		var employeename string
+		err = rows.Scan(&employeename, &employeeid)
+		if err != nil {
+			fmt.Println(err)
+			panic(err)
+		}
+		node := &Node{employeeid: strconv.Itoa(employeeid), employeename: employeename}
+		cash.Add(node)
+		cash.Hash[strconv.Itoa(employeeid)] = node
+	}
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		panic(err)
+	}
+	WriteJSONResponse(w, 200, "Data Loaded to the cache")
+	return
 }
 
 func alterEmployee(w http.ResponseWriter, r *http.Request) {

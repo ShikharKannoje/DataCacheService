@@ -14,8 +14,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var cachehost = `http://` + os.Getenv("API_GATE_DOMAIN") + "/" // localhost:8000
-var apiGateserve = os.Getenv("API_GATE_SERVER")
+var cachehost = `http://` + os.Getenv("CACHE_DOMAIN") + "/" // localhost:8000
+var apiGateserve = os.Getenv("API_GATE_SERVER")             //localhost:8080
 
 // WriteJSONResponse represents a utility function which writes status code and JSON to response
 func WriteJSONResponse(w http.ResponseWriter, statusCode int, data interface{}) {
@@ -31,6 +31,7 @@ func startupServer() {
 	r.HandleFunc("/getEmployees/{id}", getEmployees).Methods("GET")
 	r.HandleFunc("/alterEmployee", alterEmployee).Methods("PUT")
 	r.HandleFunc("/relodeDataFromDB", reloadDataFromDB).Methods("GET")
+	r.HandleFunc("/pageData/{from}/{to}", pageData).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(apiGateserve, r))
 }
@@ -40,8 +41,35 @@ func home(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusInternalServerError)
 	fmt.Fprintf(w, "Hello, The server is running")
 }
+
+func pageData(w http.ResponseWriter, r *http.Request) {
+	log.Println("ApiGatway api reached")
+	vars := mux.Vars(r)
+	to := vars["to"]
+	from := vars["from"]
+	check, err := http.Get(cachehost + "pageData/" + from + "/" + to)
+	if err != nil {
+		log.Println(err)
+	}
+	defer check.Body.Close()
+
+	checkbody, err := ioutil.ReadAll(check.Body)
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Println(string(checkbody))
+	if checkbody == nil {
+		WriteJSONResponse(w, 404, "Not Found in DB")
+		return
+	}
+	WriteJSONResponse(w, 200, strings.Trim(string(checkbody), "\n"))
+	log.Println("Transaction over")
+	return
+}
+
 func reloadDataFromDB(w http.ResponseWriter, r *http.Request) {
-	log.Println("reached here")
+	log.Println("ApiGatway api reached")
 	check, err := http.Get(cachehost + "RelodeDataFromDB")
 	if err != nil {
 		log.Println(err)
