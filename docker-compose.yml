@@ -25,7 +25,7 @@ services:
         ports:
             - '5432:5432'
         volumes: 
-            -  database_postgres:/postgresql/data
+            -  ./init:/docker-entrypoint-initdb.d/
         networks: 
             - datacacheNet
     
