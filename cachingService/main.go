@@ -22,7 +22,7 @@ var hostname = os.Getenv("DS_HOSTNAME")
 var username = os.Getenv("DS_USERNAME")
 var password = os.Getenv("DS_PASSWORD")
 var databasename = os.Getenv("DS_DATABASE")
-var serverRun = os.Getenv("DS_SERVERRUN") //localhost:8000
+var serverRun = os.Getenv("DS_SERVERRUN") //localhost:9000
 
 // const (
 // 	hostname     = "localhost"
@@ -123,7 +123,7 @@ func WriteJSONResponse(w http.ResponseWriter, statusCode int, data interface{}) 
 }
 func startupServer() {
 	r := mux.NewRouter()
-	log.Println("The cache is up")
+	log.Println("The cache is up on ", serverRun)
 	r.HandleFunc("/", home)
 	r.HandleFunc("/employeeDetails/{id}", employeeDetails).Methods("GET")
 	r.HandleFunc("/alterEmployee", alterEmployee).Methods("PUT")

@@ -2,7 +2,7 @@ FROM golang:latest
 
 LABEL maintainer="Shikhar Kannoje <shikharkannoje09@gmail.com>"
 
-WORKDIR /app
+WORKDIR /app/cachingService
 
 COPY go.mod .
 
@@ -12,15 +12,18 @@ RUN go mod download
 
 COPY . .
 
-ENV CACHE_DOMAIN localhost:9000
-ENV API_GATE_SERVER localhost:9080
+ENV CACHE_DOMAIN 0.0.0.0:9000
+ENV API_GATE_SERVER 0.0.0.0:9080
 ENV DS_HOSTPORT 5432
 ENV DS_HOSTNAME localhost
 ENV DS_USERNAME postgres
 ENV DS_PASSWORD root
 ENV DS_DATABASE employee
-ENV DS_SERVERRUN localhost:9000 
+ENV DS_SERVERRUN 0.0.0.0:9000 
 
 RUN go build
 
-CMD ["cachingService.exe", "APIGateway.exe"]
+EXPOSE 9000
+
+CMD ["go", "run", "main.go"]
+

@@ -27,7 +27,7 @@ func WriteJSONResponse(w http.ResponseWriter, statusCode int, data interface{}) 
 
 func startupServer() {
 	r := mux.NewRouter()
-	log.Println("The server is up")
+	log.Println("The APIGatway is up on ", apiGateserve)
 	r.HandleFunc("/", home)
 	r.HandleFunc("/getEmployees/{id}", getEmployees).Methods("GET")
 	r.HandleFunc("/alterEmployee", alterEmployee).Methods("PUT")

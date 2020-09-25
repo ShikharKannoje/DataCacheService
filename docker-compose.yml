@@ -1,38 +1,43 @@
-version: '3'
+version: '3.4'
 services:
-    app:
-        container_name: datacache
-        build: .
+    api-gateway:
+        container_name: apigateway
+        build: ./APIGateway
         ports:
-            -9080:9080
+            - 9080:9080
         restart: on-failure
         volumes: 
-            -api:/usr/src/app/
+            - ./APIGateway:/usr/src/app/
         depends_on:
             - datacache-postgres
-        networks: 
-            - datacacheNet
+        links: 
+            - caching-service
+        
 
-
+            
+    caching-service:
+        container_name: datacache
+        build: ./cachingService
+        ports:
+            - 9000:9000
+        restart: on-failure
+        volumes: 
+            - ./cachingService:/usr/src/app/
+        depends_on:
+            - datacache-postgres
+        links: 
+            - datacache-postgres
+           
     datacache-postgres:
         image: postgres:latest
         container_name: full_db_postgres
         environment: 
-            POSTGRES_USER=${DS_USERNAME}
-            POSTGRES_PASSWORD=${DS_PASSWORD}
-            POSTGRES_DB=${DS_DATABASE}
-            POSTGRES_HOST=${DS_HOSTNAME}
+           - POSTGRES_USER=${DS_USERNAME}
+           - POSTGRES_PASSWORD=${DS_PASSWORD}
+           - POSTGRES_DB=${DS_DATABASE}
+           - POSTGRES_HOST=${DS_HOSTNAME}
+           - POSTGRES_HOST_AUTH_METHOD=trust
         ports:
             - '5432:5432'
         volumes: 
             -  ./init:/docker-entrypoint-initdb.d/
-        networks: 
-            - datacacheNet
-    
-    volumes: 
-        api:
-        database_postgres:
-    
-    networks:
-        datacacheNet:
-            driver: bridge
