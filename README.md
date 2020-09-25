@@ -1,6 +1,6 @@
 "# dataCacheService" 
 
-Two services written, APIGatway and Cache service.
+Two services written, APIGatway and Cache service and one DB on Postgres (check init folder)
 
 1) All the API are exposed in APIGateway,
 2) All the APIs to caching serice reaches using APIGateway.
