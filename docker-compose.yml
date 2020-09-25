@@ -1,0 +1,38 @@
+version: '3'
+services:
+    app:
+        container_name: datacache
+        build: .
+        ports:
+            -9080:9080
+        restart: on-failure
+        volumes: 
+            -api:/usr/src/app/
+        depends_on:
+            - datacache-postgres
+        networks: 
+            - datacacheNet
+
+
+    datacache-postgres:
+        image: postgres:latest
+        container_name: full_db_postgres
+        environment: 
+            POSTGRES_USER=${DS_USERNAME}
+            POSTGRES_PASSWORD=${DS_PASSWORD}
+            POSTGRES_DB=${DS_DATABASE}
+            POSTGRES_HOST=${DS_HOSTNAME}
+        ports:
+            - '5432:5432'
+        volumes: 
+            -  database_postgres:/postgresql/data
+        networks: 
+            - datacacheNet
+    
+    volumes: 
+        api:
+        database_postgres:
+    
+    networks:
+        datacacheNet:
+            driver: bridge
