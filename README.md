@@ -14,7 +14,9 @@ The cache policy is LRU (Least Recently Used)
 Performance of the APIs
 
 Time taken for response
+
     Cache Hit: 25ms
+    
     Loss:   450ms
 
 
